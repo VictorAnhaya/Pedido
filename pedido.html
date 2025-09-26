@@ -2,81 +2,169 @@
 <head>
     <style>
         body {
-            background-color: black;
-            color: white;
-            font-size: 24px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             margin: 0;
-        }
-        
-        a {
-            text-decoration: none;
-            color: black;
-        }
-        
-        .box {
-            font-size: 28px;
-            color: white;
-            height: auto;
-            width: 450px;
-            border-radius: 10px;
-            background: #191919;
+            height: 100vh;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        
-        .buttons-container {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 20px;
-        }
-        
-        button {
-            height: auto;
-            min-width: 200px;
-            border-radius: 5px;
-            font-size: 20px;
-            font-weight: 600;
-            color: black;
-            white-space: normal;
+            align-items: center;
+            background: linear-gradient(-45deg, #ff758c, #ff7eb3, #ff4e50, #ec77ab);
+            background-size: 400% 400%;
+            animation: gradientBG 12s ease infinite;
+            font-family: Arial, sans-serif;
             overflow: hidden;
         }
 
-        button, #no {
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Envelope */
+        .envelope {
+            position: relative;
+            width: 320px;
+            height: 200px;
+            background: #fff0f5;
+            border: 2px solid #ff4081;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 64, 129, 0.5);
+            transition: transform 0.5s ease;
+            z-index: 10;
+        }
+
+        .envelope:hover {
+            transform: scale(1.05) rotate(-2deg);
+        }
+
+        .flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: #ff4081;
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            transform-origin: top;
+            transition: transform 0.6s ease;
+        }
+
+        .envelope.open .flap {
+            transform: rotateX(180deg);
+        }
+
+        .letter {
+            position: absolute;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: white;
+            padding: 20px;
+            text-align: center;
+            box-sizing: border-box;
+            transition: bottom 0.6s ease;
+        }
+
+        .envelope.open .letter {
+            bottom: 0;
+        }
+
+        .letter p {
+            font-size: 20px;
+            color: #ff4081;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        button {
+            min-width: 120px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            color: black;
+            background: white;
+            border: 2px solid #ff4081;
+            cursor: pointer;
+            padding: 8px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #ff4081;
+            color: white;
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 4px 15px rgba(255, 64, 129, 0.6);
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* Corações flutuando */
+        .heart {
+            position: fixed;
+            font-size: 24px;
+            color: #ff4e50;
+            animation: float 6s linear forwards;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) scale(0.8);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1.5);
+                opacity: 0;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="box">
-        <p>Aceita vir dormir cmg??</p>
-        <div class="buttons-container">
-            <button id="yes">
-                <a href="Rapunzel.webp">Sim</a>
-            </button>
-            <button id="no">Não</button>
+    <canvas id="fireworks"></canvas>
+
+    <!-- Envelope com carta -->
+    <div class="envelope" id="envelope">
+        <div class="flap"></div>
+        <div class="letter">
+            <p>Aceita sair comigo?? 💖</p>
+            <div class="buttons-container">
+                <button id="yes">Sim</button>
+                <button id="no">Não</button>
+            </div>
         </div>
     </div>
 
     <script>
         let yesButton = document.getElementById('yes');
         let noButton = document.getElementById('no');
-        let height = window.innerHeight - 50;
-        let width = window.innerWidth - 50;
+        let envelope = document.getElementById('envelope');
         let counter = 0;
-        const maxPresses = 3;
 
+        // Abre a carta ao clicar no envelope
+        envelope.addEventListener("click", () => {
+            envelope.classList.add("open");
+        });
+
+        // Botão NÃO
         noButton.addEventListener('click', function () {
-            let randomX = Math.random() * width;
-            let randomY = Math.random() * height;
-            let messages = ["Tem certeza que não?", "Melhor não continuar...", "Você está certo disso?"];
+            let randomX = Math.random() * (window.innerWidth - 50);
+            let randomY = Math.random() * (window.innerHeight - 50);
+            let messages = ["Tem certeza que não? 💔", "Pensa melhor... 💕", "Não me deixe triste 😢"];
 
             if (counter < messages.length) {
                 noButton.innerText = messages[counter];
@@ -90,9 +178,89 @@
             noButton.style.left = randomX + "px";
         });
 
+        // =====================
+        // 🎆 Fogos de artifício
+        // =====================
+        const canvas = document.getElementById("fireworks");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particles = [];
+
+        function random(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        function createFirework(x, y) {
+            const colors = ["#ff4081", "#ffeb3b", "#00e676", "#42a5f5", "#ff1744"];
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    dx: random(-5, 5),
+                    dy: random(-5, 5),
+                    life: 100,
+                    color: colors[Math.floor(Math.random() * colors.length)]
+                });
+            }
+        }
+
+        function animateFireworks() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach((p, index) => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+
+                p.x += p.dx;
+                p.y += p.dy;
+                p.dy += 0.05; 
+                p.life--;
+
+                if (p.life <= 0) {
+                    particles.splice(index, 1);
+                }
+            });
+
+            requestAnimationFrame(animateFireworks);
+        }
+
+        animateFireworks();
+
+        // Botão SIM com fogos
         yesButton.addEventListener('click', function () {
-            window.location.href = "Rapunzel.webp";
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    createFirework(random(100, canvas.width - 100), random(100, canvas.height - 200));
+                }, i * 400);
+            }
+
+            setTimeout(() => {
+                window.location.href = "Casal.webp";
+            }, 3000);
         });
+
+        // ❤️ Corações flutuando
+        function createHeart() {
+            const heart = document.createElement("div");
+            heart.classList.add("heart");
+            heart.innerHTML = "❤️";
+
+            heart.style.left = Math.random() * 100 + "vw";
+            heart.style.fontSize = Math.random() * 20 + 20 + "px";
+            heart.style.animationDuration = (Math.random() * 3 + 4) + "s";
+
+            document.body.appendChild(heart);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 6000);
+        }
+
+        setInterval(createHeart, 600);
     </script>
 </body>
 </html>
